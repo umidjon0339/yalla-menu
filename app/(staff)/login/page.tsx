@@ -32,7 +32,7 @@ export default function LoginPage() {
       document.cookie = `session=${userCredential.user.uid}; path=/; max-age=86400; SameSite=Strict`;
       
       // 3. Redirect to the Admin Menu page
-      router.push("/admin/menu");
+      router.push("/admin");
     } catch (err: any) {
       setError("Invalid email or password. Please try again.");
     } finally {

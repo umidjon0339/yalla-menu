@@ -23,6 +23,7 @@
 # misc
 .DS_Store
 *.pem
+yalla_project_structure.txt
 
 # debug
 npm-debug.log*

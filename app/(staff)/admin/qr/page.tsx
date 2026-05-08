@@ -42,7 +42,7 @@ export default function QRCodeGeneratorPage() {
   const [lang, setLang] = useState<LangType>('uz');
   const [isMounted, setIsMounted] = useState(false);
   
-  const [baseUrl, setBaseUrl] = useState("http://localhost:3000/menu");
+  const [baseUrl, setBaseUrl] = useState("/menu");
   const [tableCount, setTableCount] = useState<number>(12); 
   const [generatedTables, setGeneratedTables] = useState<number[]>([]);
 
@@ -50,6 +50,11 @@ export default function QRCodeGeneratorPage() {
     setIsMounted(true);
     const savedLang = localStorage.getItem("admin_lang") as LangType;
     if (savedLang && T[savedLang]) setLang(savedLang);
+
+    // Auto-detect domain: localhost in dev, real domain in production.
+    if (typeof window !== "undefined") {
+      setBaseUrl(`${window.location.origin}/menu`);
+    }
 
     const handleStorageChange = () => {
       const currentLang = localStorage.getItem("admin_lang") as LangType;

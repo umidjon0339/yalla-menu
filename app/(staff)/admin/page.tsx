@@ -78,57 +78,57 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#0A0A0A] text-gray-900 dark:text-white">
-      <div className="max-w-6xl mx-auto px-6 py-12">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         <header className="mb-8">
-          <h1 className="text-4xl font-black">Admin</h1>
+          <h1 className="text-3xl md:text-4xl font-black">Admin</h1>
           <p className="text-sm text-gray-500 mt-2">{t.helper}</p>
         </header>
 
-        <main className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <main className="grid grid-cols-2 md:grid-cols-2 gap-4 md:gap-6">
           <Link
             href="/admin/menu"
-            className="group flex h-56 flex-col justify-center items-start gap-6 rounded-4xl p-10 bg-gradient-to-br from-[#FFF8E6] to-[#FFE8B8] hover:scale-[1.02] transition-transform shadow-xl dark:from-[#2b2b2b] dark:to-[#222222]"
+            className="group flex h-44 sm:h-52 md:h-56 flex-col justify-center items-start gap-3 sm:gap-6 rounded-3xl md:rounded-4xl p-4 sm:p-6 md:p-10 bg-gradient-to-br from-[#FFF8E6] to-[#FFE8B8] hover:scale-[1.02] transition-transform shadow-xl dark:from-[#2b2b2b] dark:to-[#222222]"
             aria-label="Open Menu"
           >
-            <div className="flex items-center gap-6">
-              <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white shadow-md dark:bg-[#111]">
-                <Pizza className="w-9 h-9 text-[#b88600]" />
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6">
+              <div className="flex h-12 w-12 sm:h-16 sm:w-16 md:h-20 md:w-20 items-center justify-center rounded-xl sm:rounded-2xl bg-white shadow-md dark:bg-[#111]">
+                <Pizza className="w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 text-[#b88600]" />
               </div>
               <div>
-                <h2 className="text-3xl font-black leading-tight">{t.menu}</h2>
-                <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">{t.menu_desc}</p>
+                <h2 className="text-lg sm:text-2xl md:text-3xl font-black leading-tight">{t.menu}</h2>
+                <p className="hidden sm:block mt-1 text-sm text-gray-600 dark:text-gray-300">{t.menu_desc}</p>
               </div>
             </div>
           </Link>
 
           <Link
             href="/admin/orders"
-            className="group flex h-56 flex-col justify-center items-start gap-6 rounded-4xl p-10 bg-gradient-to-br from-[#FFF0EE] to-[#FFD6BF] hover:scale-[1.02] transition-transform shadow-xl dark:from-[#2b2b2b] dark:to-[#221917]"
+            className="group flex h-44 sm:h-52 md:h-56 flex-col justify-center items-start gap-3 sm:gap-6 rounded-3xl md:rounded-4xl p-4 sm:p-6 md:p-10 bg-gradient-to-br from-[#FFF0EE] to-[#FFD6BF] hover:scale-[1.02] transition-transform shadow-xl dark:from-[#2b2b2b] dark:to-[#221917]"
             aria-label="Open Orders"
           >
-            <div className="flex items-center gap-6">
-              <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white shadow-md dark:bg-[#111]">
-                <ChefHat className="w-9 h-9 text-[#e76f51]" />
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6">
+              <div className="flex h-12 w-12 sm:h-16 sm:w-16 md:h-20 md:w-20 items-center justify-center rounded-xl sm:rounded-2xl bg-white shadow-md dark:bg-[#111]">
+                <ChefHat className="w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 text-[#e76f51]" />
               </div>
               <div>
-                <h2 className="text-3xl font-black leading-tight">{t.orders}</h2>
-                <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">{t.orders_desc}</p>
+                <h2 className="text-lg sm:text-2xl md:text-3xl font-black leading-tight">{t.orders}</h2>
+                <p className="hidden sm:block mt-1 text-sm text-gray-600 dark:text-gray-300">{t.orders_desc}</p>
               </div>
             </div>
           </Link>
 
           <Link
             href="/admin/qr"
-            className="group flex h-56 flex-col justify-center items-start gap-6 rounded-4xl p-10 bg-gradient-to-br from-[#ECFDFF] to-[#D8F0FF] hover:scale-[1.02] transition-transform shadow-xl dark:from-[#0f1724] dark:to-[#071226]"
+            className="col-span-2 md:col-span-1 group flex h-44 sm:h-52 md:h-56 flex-col justify-center items-start gap-3 sm:gap-6 rounded-3xl md:rounded-4xl p-4 sm:p-6 md:p-10 bg-gradient-to-br from-[#ECFDFF] to-[#D8F0FF] hover:scale-[1.02] transition-transform shadow-xl dark:from-[#0f1724] dark:to-[#071226]"
             aria-label="QR Generator"
           >
-            <div className="flex items-center gap-6">
-              <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white shadow-md dark:bg-[#06121a]">
-                <QrCode className="w-9 h-9 text-[#0ea5e9]" />
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6">
+              <div className="flex h-12 w-12 sm:h-16 sm:w-16 md:h-20 md:w-20 items-center justify-center rounded-xl sm:rounded-2xl bg-white shadow-md dark:bg-[#06121a]">
+                <QrCode className="w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 text-[#0ea5e9]" />
               </div>
               <div>
-                <h2 className="text-3xl font-black leading-tight">{t.qr}</h2>
-                <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">{t.qr_desc}</p>
+                <h2 className="text-lg sm:text-2xl md:text-3xl font-black leading-tight">{t.qr}</h2>
+                <p className="hidden sm:block mt-1 text-sm text-gray-600 dark:text-gray-300">{t.qr_desc}</p>
               </div>
             </div>
           </Link>
