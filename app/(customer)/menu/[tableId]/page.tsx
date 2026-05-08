@@ -123,9 +123,11 @@ export default function CustomerMenuPage() {
     );
 
     const unsubscribeOrders = onSnapshot(qOrders, (snapshot) => {
-      const activeMyOrders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      
-      activeMyOrders.sort((a: any, b: any) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
+      // Explicitly type fetched orders so TypeScript knows fields like `status` and `createdAt` exist
+      const fetched: Array<{ id: string; status?: string; createdAt?: { toMillis?: () => number }; [key: string]: any }> =
+        snapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as Record<string, any>) }));
+
+      const activeMyOrders = fetched.sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
       setMyOrders(activeMyOrders);
 
       // Popup faqat oxirgi tayyor bo'lganini ko'rsatishi mumkin, kerak bo'lsa buni ham qoldirasiz:
