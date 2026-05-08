@@ -132,18 +132,10 @@ export default function CustomerMenuPage() {
         createdAt?: { toMillis?: () => number };
         [key: string]: unknown;
       }> = snapshot.docs.map((doc) => ({ id: doc.id, ...(doc.data() as Record<string, unknown>) }));
-      const savedOrdersRaw = localStorage.getItem("my_yalla_orders");
-      const myOrderIds = savedOrdersRaw ? JSON.parse(savedOrdersRaw) : [];
-
-      // Mijoz faqat o'zining qurilmasidan yuborilgan buyurtmalarni ko'radi
-      const activeMyOrders = fetched.filter((order) => myOrderIds.includes(order.id));
-      activeMyOrders.sort((a: any, b: any) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
+      const activeMyOrders = fetched.sort((a: any, b: any) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
       setMyOrders(activeMyOrders);
 
-      const ackReadyOrders = JSON.parse(localStorage.getItem("ack_ready_orders") || "[]");
-      const unacknowledgedReadyOrder = activeMyOrders.find(
-        (o) => o.status === "tayyor" && !ackReadyOrders.includes(o.id)
-      );
+      const unacknowledgedReadyOrder = activeMyOrders.find((o) => o.status === "tayyor");
 
       if (unacknowledgedReadyOrder) {
         vibrate([100, 50, 100, 50, 200]); 
@@ -176,12 +168,7 @@ export default function CustomerMenuPage() {
   };
 
   const closeReadyPopup = () => {
-    if (readyOrderPopup) {
-      const ackReadyOrders = JSON.parse(localStorage.getItem("ack_ready_orders") || "[]");
-      ackReadyOrders.push(readyOrderPopup.id);
-      localStorage.setItem("ack_ready_orders", JSON.stringify(ackReadyOrders));
-      setReadyOrderPopup(null);
-    }
+    setReadyOrderPopup(null);
   };
 
   const openItemModal = useCallback((item: any) => {

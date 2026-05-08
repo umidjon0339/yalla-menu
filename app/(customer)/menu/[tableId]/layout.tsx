@@ -71,11 +71,7 @@ export default function CustomerMenuLayout({ children }: { children: React.React
     );
 
     const unsubscribe = onSnapshot(qOrders, (snapshot) => {
-      // MUXFIYLIK: Faqat shu telefon orqali berilgan buyurtmalarni filtrlash
-      const savedOrdersRaw = localStorage.getItem("my_yalla_orders");
-      const myOrderIds = savedOrdersRaw ? JSON.parse(savedOrdersRaw) : [];
-
-      const count = snapshot.docs.filter(doc => myOrderIds.includes(doc.id)).length;
+      const count = snapshot.docs.length;
       setActiveOrdersCount(count);
     });
 
