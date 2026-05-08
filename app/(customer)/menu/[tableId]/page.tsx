@@ -272,38 +272,27 @@ export default function CustomerMenuPage() {
     <div className="pb-[100px] selection:bg-[#FFC107] selection:text-black transition-colors duration-300">
       <Toaster position="top-center" />
 
-      {/* HEADER */}
-      <header className="px-4 py-4 sticky top-0 z-40 bg-white/90 dark:bg-[#0A0A0A]/95 backdrop-blur-xl border-b border-gray-200 dark:border-white/5 transition-colors">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-black tracking-tighter text-gray-900 dark:text-white">
-            {activeTabUrl === "menu" ? <>YALLA<span className="text-[#FFC107]">.</span></> : t.orders}
-          </h1>
-          <div className="flex items-center gap-2">
-            
-            <button onClick={cycleLanguage} className="bg-gray-100 dark:bg-[#1A1A1A] text-gray-600 dark:text-white border border-gray-200 dark:border-white/5 px-2.5 py-1.5 rounded-full hover:text-[#FFC107] transition-all flex items-center justify-center shadow-sm text-[11px] font-black uppercase">
-              {lang}
+      {activeTabUrl === "menu" && (
+        <div className="px-4 pt-3">
+          <div className="flex items-center justify-between gap-3 rounded-2xl border border-gray-200 dark:border-white/5 bg-white dark:bg-[#111] px-3 py-2.5 shadow-sm">
+            <button
+              onClick={() => { vibrate(15); setIsSearchOpen(!isSearchOpen); }}
+              className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-[11px] font-black uppercase transition-all border ${isSearchOpen ? 'bg-[#FFC107] text-black border-[#FFC107]' : 'bg-gray-100 dark:bg-[#1A1A1A] text-gray-600 dark:text-white border-gray-200 dark:border-white/5'}`}
+            >
+              <Search className="w-4 h-4" />
+              {isSearchOpen ? "Yopish" : t.search}
             </button>
-            <button onClick={toggleTheme} className="bg-gray-100 dark:bg-[#1A1A1A] text-gray-600 dark:text-white border border-gray-200 dark:border-white/5 p-1.5 rounded-full hover:text-[#FFC107] transition-all flex items-center justify-center shadow-sm">
-              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            </button>
-
-            {activeTabUrl === "menu" && (
-              <button onClick={() => { vibrate(15); setIsSearchOpen(!isSearchOpen); }} className={`p-2 rounded-full transition-all border border-transparent shadow-sm ${isSearchOpen ? 'bg-[#FFC107] text-black border-[#FFC107]' : 'bg-gray-100 dark:bg-[#1A1A1A] text-gray-600 dark:text-white border-gray-200 dark:border-white/5'}`}>
-                <Search className="w-4 h-4" />
-              </button>
-            )}
-            <div className="bg-gray-100 dark:bg-[#1A1A1A] border border-gray-200 dark:border-white/5 px-3 py-1.5 rounded-full flex items-center gap-2 shadow-sm">
-              <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-              <span className="text-[11px] font-bold text-gray-600 dark:text-gray-300">{t.table} {tableId}</span>
+            <div className="text-[11px] font-bold text-gray-500 dark:text-gray-400 truncate">
+              {t.menu}
             </div>
           </div>
+          {isSearchOpen && (
+            <div className="mt-3 animate-in fade-in duration-300">
+              <input autoFocus placeholder={t.search} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="w-full bg-gray-50 dark:bg-[#111] border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl px-4 py-3 outline-none focus:border-[#FFC107]/50 focus:ring-2 focus:ring-[#FFC107]/20 text-sm shadow-sm transition-all" />
+            </div>
+          )}
         </div>
-        {isSearchOpen && activeTabUrl === "menu" && (
-          <div className="mt-3 animate-in fade-in duration-300">
-            <input autoFocus placeholder={t.search} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="w-full bg-gray-50 dark:bg-[#111] border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl px-4 py-3 outline-none focus:border-[#FFC107]/50 focus:ring-2 focus:ring-[#FFC107]/20 text-sm shadow-sm transition-all" />
-          </div>
-        )}
-      </header>
+      )}
 
       {/* VIEW 1: ASOSIY MENYU */}
       {activeTabUrl === "menu" && (
