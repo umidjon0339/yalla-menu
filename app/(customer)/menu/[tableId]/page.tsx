@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useParams, useSearchParams } from "next/navigation";
 import { collection, onSnapshot, query, orderBy, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { Search, X, Plus, Minus, Check, Trash2, Pizza, Sparkles, Receipt, ChefHat, CheckCircle2, Clock, PartyPopper, Sun, Moon } from "lucide-react";
+import { X, Plus, Minus, Check, Trash2, Pizza, Sparkles, Receipt, ChefHat, CheckCircle2, Clock, PartyPopper, Sun, Moon } from "lucide-react";
 import { Toaster } from "react-hot-toast";
 import { useCart } from "@/store/useCart";
 import CartDrawer from "./_components/CartDrawer";
@@ -74,9 +74,6 @@ export default function CustomerMenuPage() {
   const [myOrders, setMyOrders] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [menuItems, setMenuItems] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState("all");
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [selectedSize, setSelectedSize] = useState<any>(null);
@@ -216,10 +213,8 @@ export default function CustomerMenuPage() {
   };
 
   const filteredItems = useMemo(() => {
-    return menuItems
-      .filter(item => activeTab === "all" ? true : item.category === activeTab)
-      .filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()));
-  }, [menuItems, activeTab, searchQuery]);
+    return menuItems;
+  }, [menuItems]);
 
   const formatTime = (timestamp: any) => timestamp ? timestamp.toDate().toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' }) : "Hozir";
 
@@ -260,38 +255,7 @@ export default function CustomerMenuPage() {
       <Toaster position="top-center" />
 
       {activeTabUrl === "menu" && (
-        <div className="px-4 pt-3">
-          <div className="flex items-center justify-between gap-3 rounded-2xl border border-gray-200 dark:border-white/5 bg-white dark:bg-[#111] px-3 py-2.5 shadow-sm">
-            <button
-              onClick={() => { vibrate(15); setIsSearchOpen(!isSearchOpen); }}
-              className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-[11px] font-black uppercase transition-all border ${isSearchOpen ? 'bg-[#FFC107] text-black border-[#FFC107]' : 'bg-gray-100 dark:bg-[#1A1A1A] text-gray-600 dark:text-white border-gray-200 dark:border-white/5'}`}
-            >
-              <Search className="w-4 h-4" />
-              {isSearchOpen ? "Yopish" : t.search}
-            </button>
-            <div className="text-[11px] font-bold text-gray-500 dark:text-gray-400 truncate">
-              {t.menu}
-            </div>
-          </div>
-          {isSearchOpen && (
-            <div className="mt-3 animate-in fade-in duration-300">
-              <input autoFocus placeholder={t.search} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="w-full bg-gray-50 dark:bg-[#111] border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl px-4 py-3 outline-none focus:border-[#FFC107]/50 focus:ring-2 focus:ring-[#FFC107]/20 text-sm shadow-sm transition-all" />
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* VIEW 1: ASOSIY MENYU */}
-      {activeTabUrl === "menu" && (
         <>
-          <div className="px-4 py-3 flex overflow-x-auto no-scrollbar gap-2 sticky top-[68px] z-30 bg-white/90 dark:bg-[#0A0A0A]/95 backdrop-blur-xl border-b border-gray-200 dark:border-white/5 transition-colors">
-            {["all", ...categories.map(c => c.name)].map((cat) => (
-              <button key={cat} onClick={() => { vibrate(15); setActiveTab(cat); }} className={`px-5 py-2.5 rounded-full text-[13px] font-bold transition-all whitespace-nowrap border ${activeTab === cat ? 'bg-[#FFC107] text-black border-[#FFC107] shadow-lg shadow-[#FFC107]/20' : 'bg-white dark:bg-[#111] text-gray-600 dark:text-gray-400 border-gray-200 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-[#1A1A1A]'}`}>
-                {cat === "all" ? t.all : cat}
-              </button>
-            ))}
-          </div>
-
           <main className="px-4 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-5 pt-3">
             {filteredItems.map(item => {
               const qty = getItemQuantityInCart(item.id);
