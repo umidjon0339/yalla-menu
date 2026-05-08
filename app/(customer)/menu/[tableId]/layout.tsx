@@ -1,0 +1,133 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useParams, useSearchParams } from "next/navigation";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { Pizza, Receipt } from "lucide-react";
+
+// ==============================
+// LAYOUT UCHUN TARJIMALAR
+// ==============================
+const T = {
+  uz: { menu: "Menyu", orders: "Buyurtmalarim" },
+  ru: { menu: "Меню", orders: "Мои заказы" },
+  en: { menu: "Menu", orders: "My Orders" }
+};
+
+type LangType = 'uz' | 'ru' | 'en';
+type ThemeType = 'light' | 'dark';
+
+export default function CustomerMenuLayout({ children }: { children: React.ReactNode }) {
+  const params = useParams();
+  const tableId = params.tableId as string;
+  const searchParams = useSearchParams();
+  const activeTab = searchParams.get("tab") || "menu";
+
+  const [activeOrdersCount, setActiveOrdersCount] = useState(0);
+  const [lang, setLang] = useState<LangType>('uz');
+  const [isMounted, setIsMounted] = useState(false);
+
+  // 1. INITIALIZER: Mavzu va Tilni keshdan o'qish va qo'llash
+  useEffect(() => {
+    setIsMounted(true);
+    
+    // Tilni o'qish
+    const savedLang = localStorage.getItem("customer_lang") as LangType;
+    if (savedLang && T[savedLang]) setLang(savedLang);
+
+    // Mavzuni o'qish va HTML ga class qo'shish
+    const savedTheme = localStorage.getItem("customer_theme") as ThemeType;
+    if (savedTheme === 'light') {
+      document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem("customer_theme", "dark");
+    }
+
+    // Sahifalar aro (Live) o'zgarishlarni sezish (Endi setInterval shart emas!)
+    const handleStorageChange = () => {
+      const currentLang = localStorage.getItem("customer_lang") as LangType;
+      if (currentLang && T[currentLang]) setLang(currentLang);
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  // 2. JONLI BADGE (Faqat shu qurilmadagi aktiv buyurtmalar soni)
+  useEffect(() => {
+    if (!tableId) return;
+    
+    // OPTIMIZATSIYA: Firebase'dan faqat aktiv statusdagi buyurtmalarni chaqiramiz (O'qish limitini tejaydi)
+    const qOrders = query(
+      collection(db, "orders"), 
+      where("tableId", "==", tableId),
+      where("status", "in", ["yangi", "tayyorlanmoqda", "tayyor"])
+    );
+
+    const unsubscribe = onSnapshot(qOrders, (snapshot) => {
+      // MUXFIYLIK: Faqat shu telefon orqali berilgan buyurtmalarni filtrlash
+      const savedOrdersRaw = localStorage.getItem("my_yalla_orders");
+      const myOrderIds = savedOrdersRaw ? JSON.parse(savedOrdersRaw) : [];
+
+      const count = snapshot.docs.filter(doc => myOrderIds.includes(doc.id)).length;
+      setActiveOrdersCount(count);
+    });
+
+    return () => unsubscribe();
+  }, [tableId]);
+
+  const vibrate = (ms = 15) => {
+    if (typeof window !== "undefined" && navigator.vibrate) navigator.vibrate(ms);
+  };
+
+  if (!isMounted) return null;
+
+  const t = T[lang] || T.uz;
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0A0A0A] text-gray-900 dark:text-white transition-colors duration-300">
+      
+      {/* Asosiy Sahifa */}
+      {children}
+
+      {/* BOTTOM NAVIGATION BAR */}
+      <nav className="fixed bottom-0 left-0 right-0 h-[80px] bg-white/95 dark:bg-[#0A0A0A]/95 backdrop-blur-xl border-t border-gray-200 dark:border-white/5 z-50 flex items-center justify-around px-2 pb-2 transition-colors duration-300">
+        
+        {/* Menyu Tugmasi */}
+        <Link 
+          href={`/menu/${tableId}?tab=menu`}
+          onClick={() => vibrate()}
+          className={`flex flex-col items-center justify-center w-full h-full gap-1.5 transition-all duration-300 ${activeTab === "menu" ? "text-[#FFC107]" : "text-gray-500 hover:text-gray-800 dark:hover:text-gray-300"}`}
+        >
+          <div className={`p-2 rounded-full transition-colors ${activeTab === "menu" ? "bg-yellow-50 dark:bg-[#FFC107]/10" : ""}`}>
+            <Pizza className={`w-6 h-6 ${activeTab === "menu" ? "text-[#FFC107] scale-110" : "text-gray-400"}`} />
+          </div>
+          <span className={`text-[10px] font-bold ${activeTab === "menu" ? "text-[#FFC107]" : "text-gray-500"}`}>{t.menu}</span>
+        </Link>
+
+        {/* Buyurtmalarim Tugmasi */}
+        <Link 
+          href={`/menu/${tableId}?tab=orders`}
+          onClick={() => vibrate()}
+          className={`flex flex-col items-center justify-center w-full h-full gap-1.5 transition-all duration-300 relative ${activeTab === "orders" ? "text-[#FFC107]" : "text-gray-500 hover:text-gray-800 dark:hover:text-gray-300"}`}
+        >
+          <div className={`p-2 rounded-full transition-colors ${activeTab === "orders" ? "bg-yellow-50 dark:bg-[#FFC107]/10" : ""}`}>
+            <Receipt className={`w-6 h-6 ${activeTab === "orders" ? "text-[#FFC107] scale-110" : "text-gray-400"}`} />
+            
+            {/* Qizil nuqta faqat shu telefondan qilingan buyurtma uchun yonadi */}
+            {activeOrdersCount > 0 && (
+              <span className="absolute top-2 right-1/3 translate-x-2 w-4 h-4 bg-red-500 border-2 border-white dark:border-[#0A0A0A] rounded-full text-[8px] font-black text-white flex items-center justify-center shadow-[0_0_8px_rgba(239,68,68,0.8)] animate-pulse">
+                {activeOrdersCount}
+              </span>
+            )}
+          </div>
+          <span className={`text-[10px] font-bold ${activeTab === "orders" ? "text-[#FFC107]" : "text-gray-500"}`}>{t.orders}</span>
+        </Link>
+
+      </nav>
+    </div>
+  );
+}

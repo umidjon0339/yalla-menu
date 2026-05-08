@@ -1,0 +1,128 @@
+================================================================================
+YALLA RESTAURANT - DIGITAL ORDERING SYSTEM
+Project Architecture, Database Schema, and Design System
+================================================================================
+
+1. PROJECT STRUCTURE (Next.js App Router)
+--------------------------------------------------------------------------------
+We will use Next.js App Router for clean separation between Customer, Admin, 
+and Kitchen views. 
+
+yalla-menu/
+├── app/
+│   ├── (customer)/               # Customer facing pages (No Auth)
+│   │   ├── table/[tableId]/      # Dynamic route for QR scans
+│   │   │   ├── page.tsx          # Main menu for the specific table
+│   │   ├── cart/                 # Customer cart & checkout
+│   │   │   └── page.tsx
+│   │   ├── order/[orderId]/      # Live order status tracking
+│   │   │   └── page.tsx
+│   ├── (staff)/                  # Staff facing pages (Firebase Auth required)
+│   │   ├── login/                # Staff login page
+│   │   ├── admin/                # Admin Dashboard
+│   │   │   ├── menu/             # Add/Edit/Remove items (CRUD)
+│   │   │   ├── qr-generator/     # Generate & download QR codes
+│   │   │   └── settings/         # Store hours, toggle ordering
+│   │   ├── kitchen/              # Kitchen Display System (KDS)
+│   │   │   └── page.tsx          # Live Kanban board for orders
+│   ├── api/                      # Next.js Serverless API routes
+│   │   └── telegram-report/      # Endpoints (e.g., daily stats to Telegram)
+│   ├── layout.tsx                # Root layout
+│   └── globals.css               # Global styles & Tailwind config
+├── components/
+│   ├── ui/                       # Shadcn UI reusable components (buttons, dialogs)
+│   ├── customer/                 # Menu cards, Cart bottom-sheet, Category tabs
+│   ├── kitchen/                  # Order cards, Kanban columns, Timer badges
+│   └── admin/                    # Data tables, Forms, QR preview
+├── lib/
+│   ├── firebase.ts               # Firebase initialization
+│   ├── store.ts                  # Zustand state management (for cart)
+│   └── utils.ts                  # Helper functions (currency formatter)
+└── types/
+    └── index.ts                  # TypeScript interfaces (Order, MenuItem, etc.)
+
+
+2. DATABASE STRUCTURE (Firebase Firestore)
+--------------------------------------------------------------------------------
+NoSQL structure perfectly optimized for real-time reads and writes.
+
+Collection: `config` (Store settings)
+  Document: `yalla_settings`
+    - isOrderingEnabled: boolean (Toggle on/off from Admin)
+    - openingHour: string ("10:00")
+    - closingHour: string ("23:00")
+    - serviceFeePercent: number (10)
+
+Collection: `categories` (Used for menu navigation)
+  Document: `categoryId`
+    - name: string (e.g., "Pizzas", "Drinks")
+    - order: number (Used to sort tabs: 1, 2, 3...)
+    - isActive: boolean
+
+Collection: `menu_items`
+  Document: `itemId`
+    - categoryId: reference
+    - name: string ("Pepperoni Pizza")
+    - description: string ("Classic pizza with beef pepperoni")
+    - basePrice: number (50000)
+    - image: string (Firebase Storage URL)
+    - isAvailable: boolean (The "86" toggle to mark out of stock)
+    - sizes: Array of Objects
+        [{ name: "Small", price: 45000 }, { name: "Large", price: 65000 }]
+    - extras: Array of Objects
+        [{ name: "Extra Cheese", price: 8000 }]
+
+Collection: `orders` (Real-time tracking)
+  Document: `orderId`
+    - tableNumber: number (e.g., 5)
+    - status: string ("NEW" | "PREPARING" | "READY" | "COMPLETED" | "CANCELLED")
+    - items: Array of Objects
+        [{ itemId: "...", name: "Pepperoni", size: "Large", qty: 2, price: 130000, extras: ["Extra Cheese"] }]
+    - totalAmount: number
+    - createdAt: timestamp
+    - updatedAt: timestamp
+
+
+3. UI / UX DESIGN SYSTEM (Premium Minimalistic)
+--------------------------------------------------------------------------------
+The client requested a "Premium" style with Yellow + Black colors. 
+It must not look like a cheap template; it needs to look like a high-end app.
+
+A. Color Palette
+- Background: Deep Matte Black (#0A0A0A) - Not pure black, much softer on eyes.
+- Surface Cards: Dark Gray (#1A1A1A) - For menu item cards.
+- Primary Accent: Yalla Gold/Yellow (#FFC107 or #FBC02D) - Used ONLY for primary actions (Order button, active tabs).
+- Text Primary: Off-White (#F5F5F5) - High contrast, easy to read.
+- Text Secondary: Muted Gray (#8E8E93) - For descriptions and small text.
+- Status Colors (Kitchen):
+   - Red (#FF3B30) -> New Order / High Priority
+   - Yellow (#FFCC00) -> Preparing
+   - Green (#34C759) -> Ready
+
+B. Typography
+- Font Family: 'Inter' or 'Outfit' (Modern, clean, sans-serif).
+- Style: Heavy use of contrast. Large, bold headers (24px+) and small, readable body text (14px). No clutter.
+
+C. UI Elements & Components
+- Customer Menu Cards: 
+  Image takes up the top half. Bottom half has Title, subtle description, and a bright Gold price tag. 
+  No heavy borders. Use subtle drop-shadows.
+- Navigation: 
+  Horizontal scrolling pills for categories at the top (Sticky). Active category pill is solid Yalla Gold, inactive is transparent with a white border.
+- The Cart (Bottom Sheet): 
+  Instead of a separate page, the cart should be a "Sticky Bottom Bar" that pops up. Use Glassmorphism (blur background effect) so they can still see the menu slightly.
+- Buttons: 
+  Pill-shaped (fully rounded corners). Smooth hover effects.
+
+D. Customer Flow (Frictionless)
+1. Scan QR -> Opens directly to `yalla.uz/table/5`.
+2. Welcome banner -> "Table 5 - Ready to order?"
+3. Scroll and tap "+" on items. Bottom bar shows "View Cart (3 items) - 150,000 UZS".
+4. Click Cart -> Review -> Click "Send Order to Kitchen" (Big Gold Button).
+5. Success screen -> "Chef is reviewing your order."
+
+E. Kitchen Flow (High Visibility)
+1. Black background to reduce glare.
+2. Large cards grouped by columns (Kanban style): [ NEW ]  [ PREPARING ]  [ READY ]
+3. Timer in top right of each card (e.g., "05:22" ticking up).
+4. Big tap targets for the chef's dirty/wet fingers.
