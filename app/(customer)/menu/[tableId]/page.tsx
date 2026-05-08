@@ -123,16 +123,14 @@ export default function CustomerMenuPage() {
     );
 
     const unsubscribeOrders = onSnapshot(qOrders, (snapshot) => {
-      const fetched: Array<{
-        id: string;
-        status?: string;
-        createdAt?: { toMillis?: () => number };
-        [key: string]: unknown;
-      }> = snapshot.docs.map((doc) => ({ id: doc.id, ...(doc.data() as Record<string, unknown>) }));
-      const activeMyOrders = fetched.sort((a: any, b: any) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
+      const activeMyOrders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      
+      activeMyOrders.sort((a: any, b: any) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
       setMyOrders(activeMyOrders);
 
-      const unacknowledgedReadyOrder = activeMyOrders.find((o) => o.status === "tayyor");
+      // Popup faqat oxirgi tayyor bo'lganini ko'rsatishi mumkin, kerak bo'lsa buni ham qoldirasiz:
+      const ackReadyOrders = JSON.parse(localStorage.getItem("ack_ready_orders") || "[]");
+      const unacknowledgedReadyOrder = activeMyOrders.find(o => o.status === "tayyor" && !ackReadyOrders.includes(o.id));
 
       if (unacknowledgedReadyOrder) {
         vibrate([100, 50, 100, 50, 200]); 

@@ -58,9 +58,6 @@ export default function CartDrawer({ isOpen, onClose, tableId }: CartDrawerProps
     if (typeof window !== "undefined" && navigator.vibrate) navigator.vibrate(ms);
   };
 
-  // ==========================================
-  // 1. TILLAR VA MAVZUNI O'QISH
-  // ==========================================
   useEffect(() => {
     setIsMounted(true);
     if (isOpen) {
@@ -69,11 +66,7 @@ export default function CartDrawer({ isOpen, onClose, tableId }: CartDrawerProps
     }
   }, [isOpen]);
 
-  // ==========================================
-  // 2. SAVATCHANI AVTOMATIK TOZALASH (2 SOAT)
-  // ==========================================
   useEffect(() => {
-    // Agar savatchada narsa bo'lsa, uni oxirgi o'zgartirilgan vaqtini yozib qo'yamiz
     if (cart.length > 0) {
       localStorage.setItem("cart_last_updated", Date.now().toString());
     } else {
@@ -85,7 +78,6 @@ export default function CartDrawer({ isOpen, onClose, tableId }: CartDrawerProps
     if (isOpen && cart.length > 0) {
       const lastUpdated = localStorage.getItem("cart_last_updated");
       const now = Date.now();
-      // 2 soat = 2 * 60 * 60 * 1000 = 7200000 millisekund
       if (lastUpdated && now - parseInt(lastUpdated) > 7200000) {
         clearCart();
         localStorage.removeItem("cart_last_updated");
@@ -103,8 +95,8 @@ export default function CartDrawer({ isOpen, onClose, tableId }: CartDrawerProps
     setIsSubmitting(true);
 
     try {
-      // FIREBASE GA SAQLASH
-      const docRef = await addDoc(collection(db, "orders"), {
+      // FIREBASE GA SAQLASH (LocalStorage ga yozish olib tashlandi)
+      await addDoc(collection(db, "orders"), {
         tableId: tableId,
         items: cart,
         totalAmount: getTotalAmount(),
@@ -114,17 +106,11 @@ export default function CartDrawer({ isOpen, onClose, tableId }: CartDrawerProps
         paymentStatus: "kutilmoqda",
       });
 
-      // MUXFIYLIK (LOCALSTORAGE) - Boshqa mijozlar ko'rmasligi uchun
-      const savedIds = JSON.parse(localStorage.getItem("my_yalla_orders") || "[]");
-      savedIds.push(docRef.id);
-      localStorage.setItem("my_yalla_orders", JSON.stringify(savedIds));
-
       setIsSuccess(true);
       clearCart(); 
-      localStorage.removeItem("cart_last_updated"); // Savat bo'shadi
+      localStorage.removeItem("cart_last_updated"); 
       setComment("");
       
-      // YO'NALTIRISH (REDIRECT)
       setTimeout(() => {
         setIsSuccess(false);
         onClose();
@@ -140,9 +126,6 @@ export default function CartDrawer({ isOpen, onClose, tableId }: CartDrawerProps
 
   if (!isOpen || !isMounted) return null;
 
-  // ==========================================
-  // MUVAFFAQIYATLI YUBORILDI EKRANI (Light/Dark Mode)
-  // ==========================================
   if (isSuccess) {
     return (
       <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white dark:bg-[#0A0A0A] animate-in fade-in duration-300 px-4 text-center transition-colors">
@@ -159,9 +142,6 @@ export default function CartDrawer({ isOpen, onClose, tableId }: CartDrawerProps
     );
   }
 
-  // ==========================================
-  // SAVATCHA EKRANI (Light/Dark Mode)
-  // ==========================================
   return (
     <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-md sm:p-4 transition-colors">
       <div className="bg-white dark:bg-[#0A0A0A] w-full h-[95vh] sm:h-auto sm:max-h-[90vh] sm:max-w-md rounded-t-[32px] sm:rounded-[32px] relative flex flex-col overflow-hidden animate-in slide-in-from-bottom-full duration-300 shadow-2xl">
@@ -195,13 +175,9 @@ export default function CartDrawer({ isOpen, onClose, tableId }: CartDrawerProps
             <div className="space-y-4">
               {cart.map((item) => (
                 <div key={item.cartItemId} className="bg-white dark:bg-[#111] rounded-[24px] p-3 flex gap-3 border border-gray-200 dark:border-white/5 shadow-sm relative transition-colors">
-                  
-                  {/* Rasm */}
                   <div className="w-20 h-20 relative rounded-[16px] overflow-hidden bg-gray-100 dark:bg-[#1A1A1A] shrink-0">
                     <Image src={item.image} alt={item.name} fill className="object-cover" />
                   </div>
-                  
-                  {/* Ma'lumot */}
                   <div className="flex-1 flex flex-col justify-between py-1">
                     <div>
                       <h4 className="text-[14px] font-bold text-gray-900 dark:text-white leading-snug pr-6">{item.name}</h4>
@@ -211,11 +187,8 @@ export default function CartDrawer({ isOpen, onClose, tableId }: CartDrawerProps
                         {item.selectedExtras?.map((e: any) => `, +${e.name}`)}
                       </p>
                     </div>
-
                     <div className="flex items-center justify-between mt-2">
                       <span className="text-yellow-600 dark:text-[#FFC107] font-black text-[14px]">{item.itemTotal.toLocaleString()} sum</span>
-                      
-                      {/* Quantity Controller */}
                       <div className="flex items-center bg-gray-50 dark:bg-[#1A1A1A] rounded-full p-1 border border-gray-200 dark:border-white/5 shadow-inner">
                         <button 
                           onClick={() => {
@@ -239,8 +212,6 @@ export default function CartDrawer({ isOpen, onClose, tableId }: CartDrawerProps
                   </div>
                 </div>
               ))}
-
-              {/* IZOH QOLDIRISH */}
               <div className="mt-6">
                 <div className="flex items-center gap-2 mb-3 px-1">
                   <MessageSquare className="w-4 h-4 text-gray-400 dark:text-gray-500" />
