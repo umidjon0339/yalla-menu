@@ -123,5 +123,3 @@ Recommended Firestore indexes (if you start getting warnings):
 Add a `LICENSE` file if you plan to open-source the project. Currently there is no license included.
 
 ---
-
-If you want, I can also add a short developer README section with common dev commands and debugging tips, or add Firebase security rules examples.
